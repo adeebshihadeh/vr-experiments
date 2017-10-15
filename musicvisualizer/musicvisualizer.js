@@ -5,6 +5,35 @@ eq.play("audio.mp3");
 
 var graph_mode = "bar360";
 
+
+var bar360 = {
+  radius: 45,
+  init: function(data) {
+    for (var i in data) {
+      var el = document.createElement("a-box");
+
+      var angle = 360/data.length * i;
+
+      el.setAttribute("position", {x: this.radius*Math.sin(angle*(Math.PI / 180)), y: 0, z: this.radius*Math.cos(angle*(Math.PI / 180))});
+      el.setAttribute("scale", {x: (360/data.length > 1 ? 1 : 360/data.length), y: data[i]/3 + 5, z: 0.1});
+      el.setAttribute("color", "red");
+      el.className = "bar360";
+
+      scene.appendChild(el);
+    }
+  },
+  update: function(data) {
+    for (var i in data) {
+      var el = scene.querySelectorAll(".bar360")[i];
+      el.setAttribute("scale", {x: (360/data.length > 1 ? 1 : 360/data.length), y: data[i]/3 + 5, z: 0.1});
+    }
+  },
+  destroy: function() {
+    $(".bar360").remove();
+  }
+};
+
+
 // bar graph
 function bar_graph(data) {
   var max_width = 25;
@@ -101,15 +130,13 @@ function visualize() {
   }
 }
 
-function random() {
-  return 5;
-}
-
 window.onload = function () {
   scene = document.querySelector("a-scene");
 };
 
-window.setInterval(visualize, 15);
+window.setInterval(function() {
+  bar360.update(eq.getSpectrum());
+}, 15);
 
 
 $(window).keypress(function(e) {
