@@ -1,11 +1,9 @@
-var ctx = new AudioContext();
-
 var scene = document.querySelector("a-scene");
 
 var eq = new Equalizer();
 eq.play("audio.mp3");
 
-var graph_mode = "spheres";
+var graph_mode = "bar360";
 
 // bar graph
 function bar_graph(data) {
@@ -18,7 +16,7 @@ function bar_graph(data) {
     el.setAttribute("position", {x: i*max_width/data.length - ((max_width-1)/2), y: 0, z: -5});
     el.setAttribute("scale", {x: max_width/data.length, y: data[i]/120, z: 0.1});
     el.setAttribute("color", "red");
-    el.setAttribute("class", "graph");
+    el.className = "graph";
 
     scene.appendChild(el);
   }
@@ -34,16 +32,32 @@ function bar2(data) {
     el.setAttribute("position", {x: i - ((max_width-1)/2), y: 0, z: -5});
     el.setAttribute("scale", {x: max_width/data.length, y: data[i]/120, z: 0.1});
     el.setAttribute("color", "red");
-    el.setAttribute("class", "graph");
+    el.className = "graph";
 
     scene.appendChild(el);
   }
 }
 
 
-function bar360() {
-  var radius = 10;
+function bar360(data) {
+  var radius = 40;
 
+
+  $(".graph").remove();
+  for (var i in data) {
+    var el = document.createElement("a-box");
+
+    var angle = 360/data.length * i;
+
+    el.setAttribute("position", {x: radius*Math.sin(angle*(Math.PI / 180)), y: 0, z: radius*Math.cos(angle*(Math.PI / 180))});
+    el.setAttribute("scale", {x: (360/data.length > 1 ? 1 : 360/data.length), y: data[i]/3 + 5, z: 0.1});
+    el.setAttribute("color", "red");
+    el.className = "graph";
+
+    // polar to 2D
+
+    scene.appendChild(el);
+  }
 }
 
 
@@ -56,12 +70,14 @@ function graph_spheres(data) {
 
   var separation = 3;
 
+  $(".graph").remove();
   for (var i in data) {
     var el = document.createElement("a-sphere");
 
     el.setAttribute("radius", data[i] / 325);
     el.setAttribute("position", {x: (i - (data.length-1)/2)*separation, y: -2.5, z: -7});
     el.setAttribute("color", "purple");
+    el.className = "graph";
 
     scene.appendChild(el);
   }
@@ -75,6 +91,9 @@ function visualize() {
       break;
     case "bar":
       bar2(eq.getSpectrum());
+      break;
+    case "bar360":
+      bar360(eq.getSpectrum());
       break;
     default:
       graph_spheres([eq.getSpectrum()[0], eq.getSpectrum()[1], eq.getSpectrum()[2], eq.getSpectrum()[3]]);
@@ -100,6 +119,9 @@ $(window).keypress(function(e) {
       break;
     case 115:
       graph_mode = "spheres";
+      break;
+    case 51:
+      graph_mode = "bar360";
       break;
     default:
       console.log("unimplemented key: " + e.keyCode);

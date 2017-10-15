@@ -8,7 +8,11 @@
   </head>
   <body>
     <a-scene>
-      <a-video src="video.mp4" width="64" height="36" position="0 13 -50"></a-video>
+      <a-assets>
+        <video muted id="video" autoplay loop="true" src="video.mp4">
+      </a-assets>
+
+      <a-video src="#video" width="64" height="36" position="0 13 -50"></a-video>
 
       <a-sky color="black"></a-sky>
     </a-scene>
